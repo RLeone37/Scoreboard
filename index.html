@@ -469,6 +469,7 @@ font-size:7px; line-height:1;
 font-family:‘Oswald’,sans-serif; font-weight:700; font-size:1rem;
 letter-spacing:.04em; text-transform:uppercase; line-height:1; color:var(–text);
 }
+.team-rank { font-size:.62em; color:var(--text-dim, #8a92a8); font-weight:500; margin-right:3px; vertical-align:top; }
 .team-record { font-size:.68rem; color:var(–text-mute); font-weight:500; line-height:1; }
 
 .timeouts { display:flex; gap:4px; }
@@ -544,6 +545,72 @@ padding:10px 16px 0; letter-spacing:.02em;
 @media (min-width: 768px) {
 .footer-note { grid-column:2; padding-left:24px; text-align:left; }
 }
+
+/* ═══════════════════════════════════════════════════
+TEAM DETAIL SHEET
+═══════════════════════════════════════════════════ */
+.team-col.tappable { cursor:pointer; -webkit-tap-highlight-color:transparent; border-radius:12px; transition:background .15s; }
+.team-col.tappable:hover  { background:rgba(255,255,255,.04); }
+.team-col.tappable:active { background:rgba(255,255,255,.07); }
+
+.sheet-backdrop {
+position:fixed; inset:0; z-index:100;
+background:rgba(0,0,0,.55);
+opacity:0; pointer-events:none; transition:opacity .22s;
+}
+.sheet-backdrop.open { opacity:1; pointer-events:auto; }
+
+.team-sheet {
+position:fixed; left:0; right:0; bottom:0; z-index:101;
+max-height:85dvh; overflow-y:auto; -webkit-overflow-scrolling:touch;
+background:#0d1018; color:#eef0f6;
+border:1px solid rgba(255,255,255,.14); border-bottom:none;
+border-radius:20px 20px 0 0;
+padding:0 0 calc(20px + env(safe-area-inset-bottom, 0px));
+transform:translateY(100%); transition:transform .28s cubic-bezier(.2,.8,.2,1);
+}
+.team-sheet.open { transform:translateY(0); }
+@media (min-width: 768px) {
+.team-sheet {
+left:50%; right:auto; bottom:auto; top:50%; width:440px;
+border-bottom:1px solid rgba(255,255,255,.14); border-radius:20px;
+transform:translate(-50%,-46%); opacity:0; pointer-events:none;
+transition:transform .22s, opacity .22s;
+}
+.team-sheet.open { transform:translate(-50%,-50%); opacity:1; pointer-events:auto; }
+}
+
+.ts-accent { height:4px; background:var(--team-color, #3b82f6); }
+.ts-grip { width:36px; height:4px; border-radius:2px; background:rgba(255,255,255,.18); margin:8px auto 0; }
+@media (min-width: 768px) { .ts-grip { display:none; } }
+.ts-close {
+position:absolute; top:14px; right:14px; width:30px; height:30px;
+border:none; border-radius:50%; background:rgba(255,255,255,.08); color:#8a92a8;
+font-size:1.1rem; line-height:1; cursor:pointer;
+}
+.ts-head { display:flex; align-items:center; gap:14px; padding:14px 20px 16px; }
+.ts-logo { width:64px; height:64px; object-fit:contain; flex-shrink:0; }
+.ts-name { font-family:'Oswald',sans-serif; font-weight:700; font-size:1.35rem; letter-spacing:.02em; line-height:1.1; }
+.ts-name .team-rank { font-size:.7em; }
+.ts-sub { font-size:.8rem; color:#8a92a8; margin-top:4px; }
+
+.ts-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:rgba(255,255,255,.08); border-block:1px solid rgba(255,255,255,.08); }
+.ts-stat { background:#0d1018; padding:10px 8px; text-align:center; }
+.ts-stat b { display:block; font-family:'Oswald',sans-serif; font-size:1.1rem; font-weight:600; }
+.ts-stat span { font-size:.62rem; color:#8a92a8; text-transform:uppercase; letter-spacing:.08em; }
+
+.ts-section { padding:16px 20px 0; }
+.ts-section h3 { font-family:'Oswald',sans-serif; font-size:.72rem; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:#8a92a8; margin-bottom:8px; }
+.ts-game { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid rgba(255,255,255,.06); font-size:.85rem; }
+.ts-game:last-child { border-bottom:none; }
+.ts-game img { width:24px; height:24px; object-fit:contain; }
+.ts-game .opp { flex:1; }
+.ts-game .when { color:#8a92a8; font-size:.75rem; }
+.ts-res { font-family:'Oswald',sans-serif; font-weight:700; width:18px; text-align:center; }
+.ts-res.w { color:#22c55e; } .ts-res.l { color:#ef4444; } .ts-res.t { color:#8a92a8; }
+.ts-score { font-family:'Oswald',sans-serif; font-weight:500; }
+.ts-link { display:block; margin:18px 20px 0; padding:11px; text-align:center; border-radius:12px; background:rgba(255,255,255,.07); color:#eef0f6; text-decoration:none; font-size:.85rem; font-weight:500; }
+.ts-msg { padding:40px 20px; text-align:center; color:#8a92a8; font-size:.85rem; }
 </style>
 
 </head>
@@ -581,6 +648,10 @@ padding:10px 16px 0; letter-spacing:.02em;
       <span class="sidebar-icon">🏈</span> NFL
       <span class="sidebar-live-dot" id="nfl-sdot"></span>
     </button>
+    <button class="sidebar-btn" data-sport="ncaa">
+      <span class="sidebar-icon">🎓</span> NCAA
+      <span class="sidebar-live-dot" id="ncaa-sdot"></span>
+    </button>
     <button class="sidebar-btn" data-sport="mlb">
       <span class="sidebar-icon">⚾</span> MLB
       <span class="sidebar-live-dot" id="mlb-sdot"></span>
@@ -597,6 +668,11 @@ padding:10px 16px 0; letter-spacing:.02em;
     <div class="status-section active" id="nfl-live"><div class="cards-grid" id="ng-live"></div></div>
     <div class="status-section"        id="nfl-pre"> <div class="cards-grid" id="ng-pre"></div></div>
     <div class="status-section"        id="nfl-post"><div class="cards-grid" id="ng-post"></div></div>
+  </div>
+  <div class="sport-view" id="view-ncaa">
+    <div class="status-section active" id="ncaa-live"><div class="cards-grid" id="cg-live"></div></div>
+    <div class="status-section"        id="ncaa-pre"> <div class="cards-grid" id="cg-pre"></div></div>
+    <div class="status-section"        id="ncaa-post"><div class="cards-grid" id="cg-post"></div></div>
   </div>
   <div class="sport-view" id="view-mlb">
     <div class="status-section active" id="mlb-live"><div class="cards-grid" id="mg-live"></div></div>
@@ -620,6 +696,10 @@ padding:10px 16px 0; letter-spacing:.02em;
     <span class="live-badge" id="nfl-badge"></span>
     <span class="sport-icon">🏈</span>NFL
   </button>
+  <button class="sport-btn" data-sport="ncaa">
+    <span class="live-badge" id="ncaa-badge"></span>
+    <span class="sport-icon">🎓</span>NCAA
+  </button>
   <button class="sport-btn" data-sport="mlb">
     <span class="live-badge" id="mlb-badge"></span>
     <span class="sport-icon">⚾</span>MLB
@@ -630,15 +710,31 @@ padding:10px 16px 0; letter-spacing:.02em;
   </button>
 </nav>
 
+<!-- ── Team detail sheet ─────────────────────────── -->
+<div class="sheet-backdrop" id="sheetBackdrop"></div>
+<div class="team-sheet" id="teamSheet" role="dialog" aria-modal="true" aria-label="Team details">
+  <div id="teamSheetBody"></div>
+</div>
+
 <script>
 /* ═══════════════════════════════════════════════════
    CONFIG
 ═══════════════════════════════════════════════════ */
 const APIS = {
   nfl: 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard',
+  // groups=80 → all FBS games (default feed is Top 25 only)
+  ncaa:'https://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard?groups=80&limit=300',
   mlb: 'https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard',
   nhl: 'https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard',
 };
+const PREFIX = { nfl:'n', ncaa:'c', mlb:'m', nhl:'h' };
+const TEAM_API = {
+  nfl: 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams',
+  ncaa:'https://site.api.espn.com/apis/site/v2/sports/football/college-football/teams',
+  mlb: 'https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/teams',
+  nhl: 'https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/teams',
+};
+const SCORE_UNIT = { nfl:'Pts', ncaa:'Pts', mlb:'Runs', nhl:'Goals' };
 
 
 
@@ -702,9 +798,9 @@ function emptyState(msg) {
 }
 
 /* ═══════════════════════════════════════════════════
-   NFL
+   NFL + NCAA FOOTBALL
 ═══════════════════════════════════════════════════ */
-function parseNFL(data) {
+function parseNFL(data, sport='nfl') {
   return (data?.events || []).map(ev => {
     const comp   = ev.competitions?.[0] || {};
     const status = comp.status || {};
@@ -727,8 +823,9 @@ function parseNFL(data) {
         id: t.id||'', abbr: t.abbreviation||'',
         score: c.score != null ? Number(c.score) : null,
         record: c.records?.[0]?.summary || '',
-        espnLogo: pickLogo(t.logos),
+        espnLogo: pickLogo(t.logos) || t.logo,
         timeouts: c.timeouts != null ? Number(c.timeouts) : null,
+        rank: c.curatedRank?.current > 0 && c.curatedRank.current <= 25 ? c.curatedRank.current : null,
       };
     }
     const parseDnDist = txt => {
@@ -737,7 +834,7 @@ function parseNFL(data) {
       return m ? `${m[1].toUpperCase()} & ${m[2]}` : txt;
     };
     return {
-      sport:'nfl', id:ev.id, date:ev.date, state, isHalf, stName, qStr,
+      sport, id:ev.id, date:ev.date, state, isHalf, stName, qStr,
       possId: sit.possession || null,
       dnDist: parseDnDist(sit.shortDownDistanceText),
       away: teams.away||{}, home: teams.home||{},
@@ -745,8 +842,15 @@ function parseNFL(data) {
   });
 }
 
+// College: ranked matchups first, best-ranked on top
+function parseNCAA(data) {
+  const best = g => Math.min(g.away.rank || 99, g.home.rank || 99);
+  return parseNFL(data, 'ncaa').sort((a, b) => best(a) - best(b));
+}
+
 function buildNFLCard(g) {
-  const {away,home,state,isHalf,stName,qStr,possId,dnDist,date} = g;
+  const {sport,away,home,state,isHalf,stName,qStr,possId,dnDist,date} = g;
+  const abbr = t => `${t.rank?`<span class="team-rank">${t.rank}</span>`:''}${t.abbr||'–'}`;
   const isLive=state==='in'||isHalf, isPost=state==='post', isPre=state==='pre';
   const awW=isPost&&away.score>home.score, hwW=isPost&&home.score>away.score;
   const aP=!!(possId&&possId===away.id), hP=!!(possId&&possId===home.id);
@@ -776,16 +880,16 @@ function buildNFLCard(g) {
     ${isLive?'<div class="live-bar"></div>':''}
     <div class="card-top">${pill}${meta}</div>
     <div class="card-body">
-      <div class="team-col">
-        <div class="logo-wrap">${logoImg(away.abbr,away.espnLogo,'nfl')}${aP?'<div class="poss-pip">🏈</div>':''}</div>
-        <span class="team-abbr">${away.abbr||'–'}</span>
+      <div class="team-col tappable" data-sport="${g.sport}" data-team="${away.id}">
+        <div class="logo-wrap">${logoImg(away.abbr,away.espnLogo,sport)}${aP?'<div class="poss-pip">🏈</div>':''}</div>
+        <span class="team-abbr">${abbr(away)}</span>
         <span class="team-record">${away.record||''}</span>
         ${isLive&&away.timeouts!=null?toDots(away.timeouts):''}
       </div>
       <div class="score-center">${scoreArea}</div>
-      <div class="team-col">
-        <div class="logo-wrap">${logoImg(home.abbr,home.espnLogo,'nfl')}${hP?'<div class="poss-pip">🏈</div>':''}</div>
-        <span class="team-abbr">${home.abbr||'–'}</span>
+      <div class="team-col tappable" data-sport="${g.sport}" data-team="${home.id}">
+        <div class="logo-wrap">${logoImg(home.abbr,home.espnLogo,sport)}${hP?'<div class="poss-pip">🏈</div>':''}</div>
+        <span class="team-abbr">${abbr(home)}</span>
         <span class="team-record">${home.record||''}</span>
         ${isLive&&home.timeouts!=null?toDots(home.timeouts):''}
       </div>
@@ -955,13 +1059,13 @@ function buildMLBCard(g) {
     ${isLive?'<div class="live-bar"></div>':''}
     <div class="card-top">${pill}${meta}</div>
     <div class="card-body">
-      <div class="team-col">
+      <div class="team-col tappable" data-sport="${g.sport}" data-team="${away.id}">
         <div class="logo-wrap">${logoImg(away.abbr,away.espnLogo,'mlb')}</div>
         <span class="team-abbr">${away.abbr||'–'}</span>
         <span class="team-record">${away.record||''}</span>
       </div>
       <div class="score-center">${scoreArea}${innArrow}</div>
-      <div class="team-col">
+      <div class="team-col tappable" data-sport="${g.sport}" data-team="${home.id}">
         <div class="logo-wrap">${logoImg(home.abbr,home.espnLogo,'mlb')}</div>
         <span class="team-abbr">${home.abbr||'–'}</span>
         <span class="team-record">${home.record||''}</span>
@@ -1067,13 +1171,13 @@ function buildNHLCard(g) {
     ${isLive?'<div class="live-bar"></div>':''}
     <div class="card-top">${pill}${meta}</div>
     <div class="card-body">
-      <div class="team-col">
+      <div class="team-col tappable" data-sport="${g.sport}" data-team="${away.id}">
         <div class="logo-wrap">${logoImg(away.abbr,away.espnLogo,'nhl')}</div>
         <span class="team-abbr">${away.abbr||'–'}</span>
         <span class="team-record">${away.record||''}</span>
       </div>
       <div class="score-center">${scoreArea}</div>
-      <div class="team-col">
+      <div class="team-col tappable" data-sport="${g.sport}" data-team="${home.id}">
         <div class="logo-wrap">${logoImg(home.abbr,home.espnLogo,'nhl')}</div>
         <span class="team-abbr">${home.abbr||'–'}</span>
         <span class="team-record">${home.record||''}</span>
@@ -1087,8 +1191,8 @@ function buildNHLCard(g) {
    RENDER
 ═══════════════════════════════════════════════════ */
 function renderSport(sport, games) {
-  const prefix = sport === 'nfl' ? 'n' : sport === 'mlb' ? 'm' : 'h';
-  const builder = sport === 'nfl' ? buildNFLCard : sport === 'mlb' ? buildMLBCard : buildNHLCard;
+  const prefix = PREFIX[sport];
+  const builder = { nfl:buildNFLCard, ncaa:buildNFLCard, mlb:buildMLBCard, nhl:buildNHLCard }[sport];
 
   const live  = games.filter(g => g.state === 'in' || g.isHalf || g.isIntermission);
   const pre   = games.filter(g => g.state === 'pre');
@@ -1130,14 +1234,14 @@ function updateCounts() {
 ═══════════════════════════════════════════════════ */
 async function loadSport(sport, showSkel=false) {
   if (showSkel) {
-    const prefix = sport==='nfl'?'n':sport==='mlb'?'m':'h';
+    const prefix = PREFIX[sport];
     document.getElementById(`${prefix}g-live`).innerHTML = skeletons(2);
   }
   try {
     const res = await fetch(APIS[sport], { cache:'no-store' });
     if (!res.ok) throw new Error(res.status);
     const data = await res.json();
-    const parsed = sport==='nfl' ? parseNFL(data) : sport==='mlb' ? parseMLB(data) : parseNHL(data);
+    const parsed = { nfl:parseNFL, ncaa:parseNCAA, mlb:parseMLB, nhl:parseNHL }[sport](data);
     cache[sport] = parsed;
     renderSport(sport, parsed);
   } catch (e) {
@@ -1151,7 +1255,7 @@ async function loadAll(showSkel=false) {
   const btn = document.getElementById('refreshBtn');
   btn.classList.add('spin');
   if (showSkel) {
-    const prefix = activeSport==='nfl'?'n':activeSport==='mlb'?'m':'h';
+    const prefix = PREFIX[activeSport];
     document.getElementById(`${prefix}g-live`).innerHTML = skeletons(2);
   }
   await Promise.all(Object.keys(APIS).map(s => loadSport(s, false)));
@@ -1161,6 +1265,141 @@ async function loadAll(showSkel=false) {
   btn.classList.remove('spin');
   busy = false;
 }
+
+/* ═══════════════════════════════════════════════════
+   TEAM DETAIL SHEET
+═══════════════════════════════════════════════════ */
+const teamCache = {}; // `${sport}:${id}` → { at, data }
+let sheetReq = 0;
+
+async function fetchTeam(sport, id) {
+  const key = `${sport}:${id}`;
+  const hit = teamCache[key];
+  if (hit && Date.now() - hit.at < 5 * 60_000) return hit.data;
+  const get = url => fetch(url, { cache:'no-store' }).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); });
+  const [info, sched] = await Promise.all([
+    get(`${TEAM_API[sport]}/${id}`),
+    get(`${TEAM_API[sport]}/${id}/schedule`).catch(() => ({})),
+  ]);
+  let events = sched.events || [];
+  // In the postseason ESPN returns only playoff games — prepend the regular season
+  if (sched.requestedSeason?.type === 3) {
+    const reg = await get(`${TEAM_API[sport]}/${id}/schedule?seasontype=2`).catch(() => ({}));
+    events = [...(reg.events || []), ...events];
+  }
+  const data = { team: info.team || {}, events };
+  teamCache[key] = { at: Date.now(), data };
+  return data;
+}
+
+function schedGame(ev, teamId) {
+  const comp = ev.competitions?.[0] || {};
+  const cs   = comp.competitors || [];
+  const us   = cs.find(c => c.team?.id === teamId) || {};
+  const opp  = cs.find(c => c.team?.id !== teamId) || {};
+  const score = c => c.score?.displayValue ?? c.score ?? null;
+  return {
+    date: ev.date,
+    state: comp.status?.type?.state || 'pre',
+    home: us.homeAway === 'home',
+    oppAbbr: opp.team?.abbreviation || '',
+    oppName: opp.team?.shortDisplayName || opp.team?.displayName || '',
+    oppLogo: pickLogo(opp.team?.logos) || opp.team?.logo || '',
+    us: score(us), them: score(opp),
+    result: us.winner ? 'w' : opp.winner ? 'l' : 't',
+  };
+}
+
+function buildTeamSheet(sport, { team, events }) {
+  const rec   = team.record?.items || [];
+  const total = rec.find(r => r.type === 'total') || rec[0] || {};
+  const stat  = n => total.stats?.find(s => s.name === n)?.value;
+  const split = t => rec.find(r => r.type === t)?.summary;
+  const streak = stat('streak');
+  const avg = v => v != null && stat('gamesPlayed') ? v.toFixed(1) : '–';
+  const unit = SCORE_UNIT[sport];
+
+  const games = events.map(ev => schedGame(ev, team.id));
+  // College records don't include home/away splits — derive from schedule
+  const tally = home => {
+    const done = games.filter(g => g.state === 'post' && g.home === home);
+    if (!done.length) return null;
+    const w = done.filter(g => g.result === 'w').length, l = done.filter(g => g.result === 'l').length;
+    return `${w}-${l}`;
+  };
+
+  const stats = [
+    ['Record', total.summary || '–'],
+    ['Home',   split('home') || tally(true)  || '–'],
+    ['Away',   split('road') || tally(false) || '–'],
+    ['Streak', streak ? `${streak > 0 ? 'W' : 'L'}${Math.abs(streak)}` : '–'],
+    [`${unit}/G`,     avg(stat('avgPointsFor'))],
+    [`Opp ${unit}/G`, avg(stat('avgPointsAgainst'))],
+  ];
+
+  const recent = games.filter(g => g.state === 'post').slice(-5).reverse();
+  const next   = games.find(g => g.state !== 'post');
+  const oppLine = g => `<img src="${g.oppLogo}" alt="" onerror="this.style.visibility='hidden'"/>
+    <span class="opp">${g.home ? 'vs' : '@'} ${g.oppName || g.oppAbbr}</span>`;
+
+  const rank = team.rank > 0 && team.rank <= 25 ? `<span class="team-rank">${team.rank}</span>` : '';
+  const link = team.links?.find(l => l.rel?.includes('clubhouse'))?.href;
+  const color = /^[0-9a-f]{6}$/i.test(team.color || '') ? `#${team.color}` : '';
+
+  return `
+    <div class="ts-accent" style="${color ? `--team-color:${color}` : ''}"></div>
+    <div class="ts-grip"></div>
+    <button class="ts-close" id="teamSheetClose" aria-label="Close">✕</button>
+    <div class="ts-head">
+      <img class="ts-logo" src="${pickLogo(team.logos) || ''}" alt=""/>
+      <div>
+        <div class="ts-name">${rank}${team.displayName || team.abbreviation || ''}</div>
+        <div class="ts-sub">${team.standingSummary || ''}</div>
+      </div>
+    </div>
+    <div class="ts-stats">
+      ${stats.map(([k, v]) => `<div class="ts-stat"><b>${v}</b><span>${k}</span></div>`).join('')}
+    </div>
+    ${next ? `<div class="ts-section"><h3>${next.state === 'in' ? 'Now Playing' : 'Next Game'}</h3>
+      <div class="ts-game">${oppLine(next)}<span class="when">${fmtTime(next.date)}</span></div></div>` : ''}
+    ${recent.length ? `<div class="ts-section"><h3>Last ${recent.length}</h3>
+      ${recent.map(g => `<div class="ts-game">
+        <span class="ts-res ${g.result}">${g.result.toUpperCase()}</span>${oppLine(g)}
+        <span class="ts-score">${g.us}–${g.them}</span>
+      </div>`).join('')}</div>` : ''}
+    ${link ? `<a class="ts-link" href="${link}" target="_blank" rel="noopener">View on ESPN ↗</a>` : ''}`;
+}
+
+async function openTeamSheet(sport, id) {
+  if (!TEAM_API[sport] || !id) return;
+  const req = ++sheetReq;
+  const body = document.getElementById('teamSheetBody');
+  body.innerHTML = `<div class="ts-grip"></div><div class="ts-msg">Loading…</div>`;
+  document.getElementById('sheetBackdrop').classList.add('open');
+  document.getElementById('teamSheet').classList.add('open');
+  try {
+    const data = await fetchTeam(sport, id);
+    if (req === sheetReq) body.innerHTML = buildTeamSheet(sport, data);
+  } catch (e) {
+    console.error('team', sport, id, e);
+    if (req === sheetReq) body.innerHTML = `<div class="ts-grip"></div><div class="ts-msg">Couldn’t load team info.</div>`;
+  }
+}
+
+function closeTeamSheet() {
+  sheetReq++;
+  document.getElementById('sheetBackdrop').classList.remove('open');
+  document.getElementById('teamSheet').classList.remove('open');
+}
+
+// Delegated: cards are re-rendered on every refresh
+document.addEventListener('click', e => {
+  if (e.target.closest('#teamSheetClose')) return closeTeamSheet();
+  const col = e.target.closest('.team-col.tappable');
+  if (col) openTeamSheet(col.dataset.sport, col.dataset.team);
+});
+document.getElementById('sheetBackdrop').addEventListener('click', closeTeamSheet);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeTeamSheet(); });
 
 /* ═══════════════════════════════════════════════════
    UI INTERACTIONS
@@ -1196,7 +1435,7 @@ document.querySelectorAll('#statusBar .status-btn').forEach(btn => {
     document.querySelectorAll('#statusBar .status-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     activeStatus = status;
-    ['nfl','mlb','nhl'].forEach(sport => {
+    Object.keys(APIS).forEach(sport => {
       document.querySelectorAll(`#view-${sport} .status-section`).forEach(s => s.classList.remove('active'));
       const el = document.getElementById(`${sport}-${status}`);
       if (el) el.classList.add('active');

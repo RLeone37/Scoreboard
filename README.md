@@ -59,6 +59,7 @@ The NCAA feed uses `groups=80` to include all FBS games (ESPN's default is Top 2
 ```
 index.html   # Markup, styles, and JavaScript — the whole app
 README.md
+LICENSE      # Proprietary license — all rights reserved
 ```
 
 Inside `index.html`, each sport has a `parse*` function (ESPN JSON → game objects) and a `build*Card` function (game object → HTML). To add a sport:
@@ -66,3 +67,9 @@ Inside `index.html`, each sport has a `parse*` function (ESPN JSON → game obje
 1. Add its scoreboard URL to `APIS`, plus entries in `PREFIX`, `TEAM_API`, and `SCORE_UNIT`.
 2. Register its parser in `loadSport` and its card builder in `renderSport`.
 3. Add a sidebar button, a bottom-nav button, and a `view-{sport}` container.
+
+## License
+
+Copyright © 2026 RLeone37 (https://github.com/RLeone37). All rights reserved.
+
+This project is **proprietary and not open source**. No part of the source code, data, design, or documentation may be copied, modified, distributed, or used without explicit written permission. See [LICENSE](LICENSE) for the full terms.

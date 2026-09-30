@@ -292,19 +292,13 @@ gap: 0;
 /* ── DESKTOP (≥ 768px) ──────────────────────────── */
 @media (min-width: 768px) {
 
-/* Reset mobile flex shell to normal document flow */
-html, body { height: auto; overflow: auto; }
-body { display: block; padding-bottom: 32px; }
-
-/* Desktop grid layout */
+/* Same full-window shell as mobile: header stays put,
+   sidebar and content scroll independently below it */
 body > .top-chrome {
 padding-top: 14px;
 padding-bottom: 10px;
 padding-left: 28px;
 padding-right: 28px;
-position: sticky;
-top: 0;
-z-index: 60;
 display: grid;
 grid-template-columns: var(--sidebar-w) 1fr;
 gap: 0;
@@ -323,14 +317,18 @@ grid-column: 2;
 padding: 0;
 }
 
-/* Scroll region: normal block, grid for sidebar + content */
+/* Scroll region: sidebar + content side by side, each scrolls on its own */
 .scroll-region {
-overflow: visible;
+overflow: hidden;
 padding-bottom: 0;
-flex: none;
-display: grid;
-grid-template-columns: var(--sidebar-w) 1fr;
-min-height: calc(100dvh - 120px);
+display: flex;
+min-height: 0;
+}
+.content {
+flex: 1;
+min-width: 0;
+overflow-y: auto;
+padding-bottom: 24px;
 }
 
 /* Hide mobile bottom nav */
@@ -340,15 +338,12 @@ min-height: calc(100dvh - 120px);
 .sidebar {
 display: flex;
 flex-direction: column;
-grid-column: 1;
+width: var(--sidebar-w);
+flex-shrink: 0;
 border-right: 1px solid var(--border);
 background: var(--surface);
 padding: 20px 0;
-position: sticky;
-top: 120px;
-height: calc(100dvh - 120px);
 overflow-y: auto;
-align-self: start;
 }
 
 .sidebar-btn {
@@ -376,10 +371,6 @@ background: var(--live-red); margin-left: auto;
 display: none; animation: blink 1.6s ease-in-out infinite;
 }
 .sidebar-live-dot.show { display: block; }
-
-/* Sport views in column 2 */
-.sport-view { grid-column: 2; display: none; }
-.sport-view.active { display: block; }
 
 .status-section { padding: 10px 24px 0; }
 
@@ -543,7 +534,7 @@ text-align:center; font-size:.68rem; color:var(--text-mute);
 padding:10px 16px 0; letter-spacing:.02em;
 }
 @media (min-width: 768px) {
-.footer-note { grid-column:2; padding-left:24px; text-align:left; }
+.footer-note { padding-left:24px; text-align:left; }
 }
 
 /* ═══════════════════════════════════════════════════
@@ -663,6 +654,7 @@ font-size:1.1rem; line-height:1; cursor:pointer;
   </aside>
 
   <!-- Sport views -->
+  <main class="content">
 
   <div class="sport-view active" id="view-nfl">
     <div class="status-section active" id="nfl-live"><div class="cards-grid" id="ng-live"></div></div>
@@ -686,6 +678,7 @@ font-size:1.1rem; line-height:1; cursor:pointer;
   </div>
 
   <p class="footer-note" id="footNote"></p>
+  </main>
 
 </div><!-- end scroll-region -->
 

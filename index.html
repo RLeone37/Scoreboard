@@ -1415,7 +1415,8 @@ function switchSport(sport) {
   document.getElementById(`view-${sport}`).classList.add('active');
   activeSport = sport;
   updateCounts();
-  if (!cache[sport]) loadSport(sport, true).then(updateCounts);
+  if (cache[sport]) pickDefaultStatus();
+  else loadSport(sport, true).then(() => { updateCounts(); if (activeSport === sport) pickDefaultStatus(); });
 }
 
 // Mobile sport buttons
@@ -1429,18 +1430,27 @@ document.querySelectorAll('.sidebar-btn').forEach(btn => {
 });
 
 // Status tabs — single shared bar
-document.querySelectorAll('#statusBar .status-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const status = btn.dataset.status;
-    document.querySelectorAll('#statusBar .status-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    activeStatus = status;
-    Object.keys(APIS).forEach(sport => {
-      document.querySelectorAll(`#view-${sport} .status-section`).forEach(s => s.classList.remove('active'));
-      const el = document.getElementById(`${sport}-${status}`);
-      if (el) el.classList.add('active');
-    });
+function setStatus(status) {
+  document.querySelectorAll('#statusBar .status-btn').forEach(b => b.classList.toggle('active', b.dataset.status === status));
+  activeStatus = status;
+  Object.keys(APIS).forEach(sport => {
+    document.querySelectorAll(`#view-${sport} .status-section`).forEach(s => s.classList.remove('active'));
+    const el = document.getElementById(`${sport}-${status}`);
+    if (el) el.classList.add('active');
   });
+}
+
+// Open on Live when something's on, otherwise Upcoming (Final if nothing's scheduled)
+function pickDefaultStatus() {
+  const games = cache[activeSport] || [];
+  const anyLive = games.some(g => g.state==='in' || g.isHalf || g.isIntermission);
+  const anyPre  = games.some(g => g.state==='pre');
+  const anyPost = games.some(g => g.state==='post');
+  setStatus(anyLive ? 'live' : anyPre || !anyPost ? 'pre' : 'post');
+}
+
+document.querySelectorAll('#statusBar .status-btn').forEach(btn => {
+  btn.addEventListener('click', () => setStatus(btn.dataset.status));
 });
 
 // Refresh
@@ -1449,7 +1459,7 @@ document.getElementById('refreshBtn').addEventListener('click', () => loadAll(fa
 /* ═══════════════════════════════════════════════════
    BOOT
 ═══════════════════════════════════════════════════ */
-loadAll(true);
+loadAll(true).then(pickDefaultStatus);
 setInterval(() => loadAll(false), 30_000);
 </script>
 

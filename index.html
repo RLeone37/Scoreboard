@@ -542,7 +542,9 @@ padding:10px 16px 0; letter-spacing:.02em;
 }
 @media (min-width: 768px) {
 .footer-note { padding-left:24px; text-align:left; }
-.copyright   { padding-left:24px; text-align:left; }
+/* Desktop: notice lives at the bottom of the sidebar instead of the list */
+.list-copyright { display:none; }
+.sidebar-copyright { margin-top:auto; padding:16px 20px 0; text-align:left; line-height:1.5; }
 }
 .copyright {
 text-align:center; font-size:.62rem; color:var(--text-mute);
@@ -664,6 +666,7 @@ font-size:1.1rem; line-height:1; cursor:pointer;
       <span class="sidebar-icon">🏒</span> NHL
       <span class="sidebar-live-dot" id="nhl-sdot"></span>
     </button>
+    <p class="copyright sidebar-copyright">© 2026 RLeone37. All Rights Reserved. <a href="https://github.com/RLeone37/Scoreboard/blob/main/LICENSE" target="_blank" rel="noopener">License</a></p>
   </aside>
 
   <!-- Sport views -->
@@ -691,7 +694,7 @@ font-size:1.1rem; line-height:1; cursor:pointer;
   </div>
 
   <p class="footer-note" id="footNote"></p>
-  <p class="copyright">© 2026 RLeone37. All Rights Reserved. <a href="https://github.com/RLeone37/Scoreboard/blob/main/LICENSE" target="_blank" rel="noopener">License</a></p>
+  <p class="copyright list-copyright">© 2026 RLeone37. All Rights Reserved. <a href="https://github.com/RLeone37/Scoreboard/blob/main/LICENSE" target="_blank" rel="noopener">License</a></p>
   </main>
 
 </div><!-- end scroll-region -->

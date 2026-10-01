@@ -552,6 +552,16 @@ padding:6px 16px 0; letter-spacing:.02em;
 }
 .copyright a { color:var(--text-dim); text-decoration:underline; text-underline-offset:2px; }
 
+/* Phone portrait: pin the notice just above the sport bar */
+.bar-copyright { display:none; }
+@media (max-width: 767px) and (orientation: portrait) {
+.bar-copyright {
+display:block; flex-shrink:0; margin:0;
+padding:8px 16px; background:var(--bg); border-top:1px solid var(--border);
+}
+.list-copyright { display:none; }
+}
+
 /* ═══════════════════════════════════════════════════
 TEAM DETAIL SHEET
 ═══════════════════════════════════════════════════ */
@@ -700,6 +710,8 @@ font-size:1.1rem; line-height:1; cursor:pointer;
 </div><!-- end scroll-region -->
 
 <!-- ── Mobile bottom sport bar ───────────────────── -->
+
+<p class="copyright bar-copyright">© 2026 RLeone37. All Rights Reserved. <a href="https://github.com/RLeone37/Scoreboard/blob/main/LICENSE" target="_blank" rel="noopener">License</a></p>
 
 <nav class="sport-bar">
   <button class="sport-btn active" data-sport="nfl">
